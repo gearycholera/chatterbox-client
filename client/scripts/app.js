@@ -14,11 +14,19 @@ var app = {
   },
 
   server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
-
+  
+  friends: {},
+  
   handleUsernameClick: function() {
-    $( '#main .username' ).on('click', function () {
-      console.log('click'); 
-    });
+    console.log('hi'); 
+
+    $('.username').on('click', function () {
+      if (!app.friends[$(this).text()]) {
+        $('#friendList').append('<div class="friends" id="' + $(this).text() + '">' + $(this).text() + '</div>');
+        app.friends[$(this).text()] = 1;
+      }
+      
+    }); 
   },
   
   handleSubmit: function() {
@@ -60,6 +68,7 @@ var app = {
         for (var i = 0; i < data['results'].length; i++) {
           app.renderMessage(data['results'][i]);
         }
+        app.handleUsernameClick();
       },
     });
   },
@@ -90,23 +99,24 @@ var app = {
   }, 
 
   renderMessage: function(message) {
-    var user = message.username;
-    var mess = message.text;
-    var time = message.createdAt;
-    var room = message.roomname;
-    $('#chats').append('<div class="username">' + user + '</div>');
-    $('#chats').append('<div class="message">' + JSON.stringify(mess) + '</div>');
-    $('#chats').append('<div class="time">' + time + '</div>'); 
-    $('#chats').append('<div class="room">' + room + '</div>'); 
-     
+    var user = _.escape(message.username);
+    var mess = _.escape(message.text);
+    var time = _.escape(message.createdAt);
+    var room = _.escape(message.roomname);
+    var $container = $('<div class="' + room + '" id="' + user + '"> </div>');
+    $container.html('username: ' + '<span class="username">' + user + '</span>' + '<br>' + JSON.stringify(mess) + '<br>' + time);
+    // $('#chats').append('<div class="username" class="' + user + '">' + user + '</div>');
+    // $('#chats').append('<div class="message">' + JSON.stringify(mess) + '</div>');
+    // $('#chats').append('<div class="time">' + time + '</div>'); 
+    // $('#chats').append('<div class="room" class="' + room + '">' + room + '</div>'); 
+    $('#chats').append($container);
   }, 
 
   renderRoom: function(message) {
     console.log(message);
     var roomname = message;
     $('#roomSelect').append('<option>' + roomname + '</option>');
-  },
-
+  }
 };
 
 
@@ -130,4 +140,5 @@ $(document).on('ready', function() {
     name = prompt('What is your name?');
     window.location.search = 'username=' + name;  
   });
+  
 });
