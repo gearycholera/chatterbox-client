@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html>
   <head>
     <meta charset="utf-8">
@@ -15,7 +15,8 @@
         if (newSearch !== '' & newSearch !== '?') {
           newSearch += '&';
         }
-        newSearch += 'username=' + (prompt('What is your name?') || 'anonymous');
+        var name = prompt('What is your name?');
+        newSearch += 'username=' + ( name || 'anonymous');
         window.location.search = newSearch;
       }
     </script>
@@ -27,7 +28,14 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
+      <select id="roomSelect"></select>
+      <input type="text" placeholder="enter your message" required>
+      <div id="rooms">dropdown list</div>
+      <button id="submit">Submit</button>
+      <button id="refresh">Refresh</button>
+      <button id="name">Change User Name</button>
     </div>
     <div id="chats"></div>
+    
   </body>
 </html>

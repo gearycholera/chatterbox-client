@@ -1,4 +1,4 @@
-// // YOUR CODE HERE:
+// YOUR CODE HERE:
 // var message = {
 //   username: 'shawndrost',
 //   text: 'trololo',
@@ -7,20 +7,38 @@
 
 var app = {
   init: function() {
-    $( '#main .username' ).on('click', app.handleUsernameClick);
+    app.handleUsernameClick();
+    app.handleSubmit();
+    app.fetch();
+    app.rooms();
   },
 
   server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
 
+  handleUsernameClick: function() {
+    $( '#main .username' ).on('click', function () {
+      console.log('click'); 
+    });
+  },
+  
+  handleSubmit: function() {
+    $( '#main .submit' ).on('click', function () {
+      return true; 
+    });
+  },
+  
   send: function(message) {
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
       url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
       type: 'POST',
-      data: message,
+      data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
         console.log('chatterbox: Message sent');
+        app.fetch(); 
+        app.clearMessages(); 
+        location.reload();
       },
       error: function (data) {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -34,15 +52,36 @@ var app = {
       // This is the url you should use to communicate with the parse API server.
       url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
       type: 'GET',
-      data: message,
+      data: {
+        order: "-createdAt"
+      },
       contentType: 'application/json',
       success: function (data) {
-        app.server = 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages';
+        for (var i = 0; i < data['results'].length; i++) {
+          app.renderMessage(data['results'][i]);
+        }
       },
-      error: function (data) {
-        // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-        console.error('chatterbox: Failed to send message', data);
-      }
+    });
+  },
+
+  rooms: function() {
+    $.ajax({
+      // This is the url you should use to communicate with the parse API server.
+      url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
+      type: 'GET',
+      data: {
+        order: "-createdAt"
+      },
+      contentType: 'application/json',
+      success: function (data) {
+        var obj = {};
+        for (var i = 0; i < data['results'].length; i++) {
+          obj[data['results'][i].roomname] = data['results'][i].roomname;
+        }
+        for (var key in obj) {
+          app.renderRoom(obj[key]);
+        }
+      },
     });
   },
 
@@ -51,16 +90,44 @@ var app = {
   }, 
 
   renderMessage: function(message) {
-    $('#chats').append('<div class="username">' + message + '</div>'); 
+    var user = message.username;
+    var mess = message.text;
+    var time = message.createdAt;
+    var room = message.roomname;
+    $('#chats').append('<div class="username">' + user + '</div>');
+    $('#chats').append('<div class="message">' + JSON.stringify(mess) + '</div>');
+    $('#chats').append('<div class="time">' + time + '</div>'); 
+    $('#chats').append('<div class="room">' + room + '</div>'); 
+     
   }, 
 
-  renderRoom: function(room) {
-    $('#roomSelect').append('<div>' + room + '</div>');
+  renderRoom: function(message) {
+    console.log(message);
+    var roomname = message;
+    $('#roomSelect').append('<option>' + roomname + '</option>');
   },
-  
-  handleUsernameClick: function() {
-    return true; 
-  } 
+
 };
 
 
+$(document).on('ready', function() {
+  app.init();
+
+  $('#submit').on('click', function () {
+    var message = {
+      username: name,
+      text: $( ':text' ).val(),
+      roomname: $('#roomSelect').val()
+    };
+    app.send(message);
+  });
+
+  $('#refresh').on('click', function () {
+    location.reload();
+  });
+  
+  $('#name').on('click', function () {
+    name = prompt('What is your name?');
+    window.location.search = 'username=' + name;  
+  });
+});
