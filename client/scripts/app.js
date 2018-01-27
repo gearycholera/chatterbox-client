@@ -4,17 +4,19 @@
 //   text: 'trololo',
 //   roomname: '4chan'
 // };
+var roomsObj = {};
 
 var app = {
   init: function() {
     app.handleUsernameClick();
+    app.handleFriendClick(); 
     app.handleSubmit();
     app.fetch();
     app.rooms();
   },
 
   server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
-  
+
   friends: {},
   
   handleUsernameClick: function() {
@@ -22,11 +24,27 @@ var app = {
 
     $('.username').on('click', function () {
       if (!app.friends[$(this).text()]) {
-        $('#friendList').append('<div class="friends" id="' + $(this).text() + '">' + $(this).text() + '</div>');
+      //id="' + $(this).text() + '"
+        var $buddy = $('<div class="friendName"> </div>');
+        $buddy.html('<div id="' + $(this).text() + '">' + $(this).text() + '</div>');
+        $('#friendList').append($buddy);
         app.friends[$(this).text()] = 1;
+        app.init();
+        // $('#chats').empty();
+      //   app.fetch($(this).text());
+      //   console.log($(this)); 
       }
       
     }); 
+  },
+
+  handleFriendClick: function () {
+    $('.friendName').on('click', function () {
+      console.log($(this));
+      $('#chats').empty();
+      app.fetch($(this).text());
+      console.log($(this).text());
+    });
   },
   
   handleSubmit: function() {
@@ -46,7 +64,7 @@ var app = {
         console.log('chatterbox: Message sent');
         app.fetch(); 
         app.clearMessages(); 
-        location.reload();
+        app.init();
       },
       error: function (data) {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -55,7 +73,7 @@ var app = {
     });
   },
 
-  fetch: function() {
+  fetch: function(name) {
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
       url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
@@ -65,8 +83,15 @@ var app = {
       },
       contentType: 'application/json',
       success: function (data) {
+        
         for (var i = 0; i < data['results'].length; i++) {
-          app.renderMessage(data['results'][i]);
+          if (name === undefined) {
+            app.renderMessage(data['results'][i]);
+          }
+         
+          if (name === data['results'][i].username) {
+            app.renderMessage(data['results'][i]);
+          }
         }
         app.handleUsernameClick();
       },
@@ -83,12 +108,11 @@ var app = {
       },
       contentType: 'application/json',
       success: function (data) {
-        var obj = {};
         for (var i = 0; i < data['results'].length; i++) {
-          obj[data['results'][i].roomname] = data['results'][i].roomname;
+          roomsObj[data['results'][i].roomname] = data['results'][i].roomname;
         }
-        for (var key in obj) {
-          app.renderRoom(obj[key]);
+        for (var key in roomsObj) {
+          app.renderRoom(roomsObj[key]);
         }
       },
     });
@@ -133,7 +157,9 @@ $(document).on('ready', function() {
   });
 
   $('#refresh').on('click', function () {
-    location.reload();
+    app.fetch(); 
+    app.clearMessages(); 
+    app.init();
   });
   
   $('#name').on('click', function () {
@@ -141,4 +167,7 @@ $(document).on('ready', function() {
     window.location.search = 'username=' + name;  
   });
   
+  $('#delete').on('click', function () {
+    $('#chats').empty();
+  });
 });
