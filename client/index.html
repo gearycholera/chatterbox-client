@@ -30,11 +30,13 @@
       <!-- Your HTML goes here! -->
       <select id="roomSelect" onchange="app.roomPicker()"></select>
       <input type="text" placeholder="enter your message" required>
-      <button id="submit">Submit</button>
-      <button id="refresh">Refresh</button>
-      <button id="delete">clear</button>
-      <button id="name">Change User Name</button>
-      <button id="addRoom">Create a new room</button>
+      <div>
+      <div class="btn" id="submit">Submit</div>
+      <div class="btn" id="addRoom">Submit(new room)</div>
+      <div class="btn" id="refresh">Refresh</div>
+      <div class="btn" id="name">Change User</div>
+      </div>
+      <div id="buddyList">Buddy List:</div>
       <div id="friendList"></div>
     </div>
     <div id="chats">

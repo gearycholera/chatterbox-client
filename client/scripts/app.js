@@ -11,7 +11,6 @@ var app = {
     app.handleUsernameClick();
     app.handleFriendClick(); 
     app.handleSubmit();
-
     app.fetch();
     app.rooms();
   },
@@ -133,7 +132,7 @@ var app = {
     var mess = _.escape(message.text);
     var time = _.escape(message.createdAt);
     var room = _.escape(message.roomname);
-    var $container = $('<div class="' + room + '" id="' + user + '"> </div>');
+    var $container = $('<div class="messageBox ' + room + '" id="' + user + '"> </div>');
     $container.html('username: ' + '<span class="username">' + user + '</span>' + '<br>' + JSON.stringify(mess) + '<br>' + time + '<br>' + room);
     // $('#chats').append('<div class="username" class="' + user + '">' + user + '</div>');
     // $('#chats').append('<div class="message">' + JSON.stringify(mess) + '</div>');
@@ -179,6 +178,12 @@ $(document).on('ready', function() {
   $('#addRoom').on('click', function () {
     var newRoom = prompt('What is the name of your new room?');
     $('#chats').empty();
+    var message = {
+      username: name,
+      text: $( ':text' ).val(),
+      roomname: newRoom
+    };
+    app.send(message);
   });
 
   
