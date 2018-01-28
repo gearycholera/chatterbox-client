@@ -11,6 +11,7 @@ var app = {
     app.handleUsernameClick();
     app.handleFriendClick(); 
     app.handleSubmit();
+
     app.fetch();
     app.rooms();
   },
@@ -20,7 +21,6 @@ var app = {
   friends: {},
   
   handleUsernameClick: function() {
-    console.log('hi'); 
 
     $('.username').on('click', function () {
       if (!app.friends[$(this).text()]) {
@@ -30,20 +30,21 @@ var app = {
         $('#friendList').append($buddy);
         app.friends[$(this).text()] = 1;
         app.init();
-        // $('#chats').empty();
-      //   app.fetch($(this).text());
-      //   console.log($(this)); 
       }
       
     }); 
   },
+  
+  roomPicker: function() {
+    var temproom = $('#roomSelect').val();
+    $('#chats').empty();
+    app.fetch(temproom);
+  },
 
   handleFriendClick: function () {
     $('.friendName').on('click', function () {
-      console.log($(this));
       $('#chats').empty();
       app.fetch($(this).text());
-      console.log($(this).text());
     });
   },
   
@@ -92,6 +93,10 @@ var app = {
           if (name === data['results'][i].username) {
             app.renderMessage(data['results'][i]);
           }
+          
+          if (name === data['results'][i].roomname) {
+            app.renderMessage(data['results'][i]);
+          }
         }
         app.handleUsernameClick();
       },
@@ -108,6 +113,7 @@ var app = {
       },
       contentType: 'application/json',
       success: function (data) {
+        $('#roomSelect').empty();
         for (var i = 0; i < data['results'].length; i++) {
           roomsObj[data['results'][i].roomname] = data['results'][i].roomname;
         }
@@ -128,7 +134,7 @@ var app = {
     var time = _.escape(message.createdAt);
     var room = _.escape(message.roomname);
     var $container = $('<div class="' + room + '" id="' + user + '"> </div>');
-    $container.html('username: ' + '<span class="username">' + user + '</span>' + '<br>' + JSON.stringify(mess) + '<br>' + time);
+    $container.html('username: ' + '<span class="username">' + user + '</span>' + '<br>' + JSON.stringify(mess) + '<br>' + time + '<br>' + room);
     // $('#chats').append('<div class="username" class="' + user + '">' + user + '</div>');
     // $('#chats').append('<div class="message">' + JSON.stringify(mess) + '</div>');
     // $('#chats').append('<div class="time">' + time + '</div>'); 
@@ -137,9 +143,8 @@ var app = {
   }, 
 
   renderRoom: function(message) {
-    console.log(message);
     var roomname = message;
-    $('#roomSelect').append('<option>' + roomname + '</option>');
+    $('#roomSelect').append('<option class="channels">' + roomname + '</option>');
   }
 };
 
@@ -170,4 +175,11 @@ $(document).on('ready', function() {
   $('#delete').on('click', function () {
     $('#chats').empty();
   });
+  
+  $('#addRoom').on('click', function () {
+    var newRoom = prompt('What is the name of your new room?');
+    $('#chats').empty();
+  });
+
+  
 });

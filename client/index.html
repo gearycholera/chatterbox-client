@@ -28,12 +28,13 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
-      <select id="roomSelect"></select>
+      <select id="roomSelect" onchange="app.roomPicker()"></select>
       <input type="text" placeholder="enter your message" required>
       <button id="submit">Submit</button>
       <button id="refresh">Refresh</button>
       <button id="delete">clear</button>
       <button id="name">Change User Name</button>
+      <button id="addRoom">Create a new room</button>
       <div id="friendList"></div>
     </div>
     <div id="chats">
